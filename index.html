@@ -1,1 +1,537 @@
-<h1>hello,world</h1>
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+
+<body>
+
+<!-- load the d3.js library -->    	
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+
+<!-- Add 3 buttons-->
+  <br>
+  <center><h2> US Abortion & Pregnancy Visualized </h2></center>
+  <center><h3> Yearly Abortion Ratio Numbers From 1988 To 2017.</h3></center>
+  <center><p> Published by Maggie Zhang, July 31 2022.</p></center>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" onclick="update_young()">Young Group</button>
+<button type="button" onclick="update_middle()">Middle Age Group</button>
+<button type="button" onclick="update_old()">Elderly Group</button>
+
+
+
+</form>
+<p></p>
+  
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 50, right: 620, bottom: 30, left: 70},
+    width = 1400 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// parse the date / time
+var parseTime = d3.timeParse("%Y");
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+
+// define the line
+var valueline = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.abortion_ratio); });
+var valueline_preg = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.preg_perc); });
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+  
+// // // // // // // // // default young // // // // // // // // 
+  
+// Get the data
+d3.csv("https://raw.githubusercontent.com/mz44zhang/test/main/young.csv").then(function(data) {
+
+  // format the data
+  data.forEach(function(d) {
+      d.year = parseTime(d.year);
+      d.preg_perc = d.preg_perc;
+      d.abortion_ratio = d.abortion_ratio;
+  });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.year; }));
+  y.domain([0, 0.4]);
+
+  // Add the valueline path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none")
+      .attr("d", valueline);
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("stroke", "orange")
+    .style("stroke-dasharray", ("7,3"))
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none")
+      .attr("d", valueline_preg);
+
+  // Add the x Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // Add the y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+  svg.append("rect").attr("x",600).attr("y",25).attr("width",13).attr("height", 10).style("fill", "steelblue")
+svg.append("rect").attr("x",600).attr("y",55).attr("width", 13).attr("height", 10).style("fill", "orange")
+svg.append("text").attr("x", 620).attr("y", 30).text("Abortion Ratio").style("font-size", "15px").attr("alignment-baseline","middle").style('fill', 'steelblue')
+svg.append("text").attr("x", 620).attr("y", 60).text("Pregnancy Percentage").style("font-size", "15px").attr("alignment-baseline","middle").style('fill', 'orange')
+
+
+  const annotations = [
+              {
+                note: {
+                  label: "Among young age group, the lowest abortion rate is in 2015 with ratio of 0.24.",
+                  title: "Lowest abortion rate"
+                },
+                connector: {
+                  end: "dot",        // Can be none, or arrow or dot
+                  type: "line",      // ?? don't know what it does
+                  lineType: "vertical",    // ?? don't know what it does
+                  endScale: 8     // dot size
+                },
+                color: ["purple"],
+                x: 730,
+                y: 220,
+                dy: 50,
+                dx: -40
+              }
+            ]
+            // Add annotation to the chart
+            const makeAnnotations = d3.annotation()
+              .annotations(annotations)
+            d3.select("svg")
+              .append("g")
+              .call(makeAnnotations);
+
+              svg.append("text")
+	.text("Overall, the abortion rate among young people (age <= 20)  has been significantly ")
+	.attr("x", 800)
+	.attr("y", -30);
+  svg.append("text")
+  .text("decreasing over the past two decedes. The pregnant percentage is also decreasing.")
+  .attr("x", 800)
+	.attr("y", 0);
+    svg.append("text")
+  .text("However, what is worth noticing is that the abortion rate is still relatively high, ")
+	.attr("x", 800)
+	.attr("y", 30);
+  svg.append("text")
+  .text("especially compared to other age groups, which is alarming to our society.")
+  .attr("x", 800)
+	.attr("y", 60);
+
+
+});
+
+
+  var update_young = function () {
+  d3.select("svg").remove();
+  // set the dimensions and margins of the graph
+var margin = {top: 50, right: 620, bottom: 30, left: 70},
+    width = 1400 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// parse the date / time
+var parseTime = d3.timeParse("%Y");
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+
+// define the line
+var valueline = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.abortion_ratio); });
+
+var valueline_preg = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.preg_perc); });
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+  
+    
+    
+// Get the data
+d3.csv("https://raw.githubusercontent.com/mz44zhang/test/main/young.csv").then(function(data) {
+
+  // format the data
+  data.forEach(function(d) {
+      d.year = parseTime(d.year);
+      d.preg_perc = d.preg_perc;
+      d.abortion_ratio = d.abortion_ratio;
+  });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.year; }));
+  y.domain([0, 0.4]);
+
+  // Add the valueline path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none")
+      .attr("d", valueline);
+
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("stroke", "orange")
+    .style("stroke-dasharray", ("7,3"))
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none")
+      .attr("d", valueline_preg);
+
+  // Add the x Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // Add the y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+  
+  svg.append("rect").attr("x",600).attr("y",25).attr("width",13).attr("height", 10).style("fill", "steelblue")
+svg.append("rect").attr("x",600).attr("y",55).attr("width", 13).attr("height", 10).style("fill", "orange")
+svg.append("text").attr("x", 620).attr("y", 30).text("Abortion Ratio").style("font-size", "15px").attr("alignment-baseline","middle").style('fill', 'steelblue')
+svg.append("text").attr("x", 620).attr("y", 60).text("Pregnancy Percentage").style("font-size", "15px").attr("alignment-baseline","middle").style('fill', 'orange')
+
+
+  const annotations = [
+              {
+                note: {
+                  label: "Among young age group, the lowest abortion rate is in 2015 with ratio of 0.24.",
+                  title: "Lowest abortion rate"
+                },
+                connector: {
+                  end: "dot",        // Can be none, or arrow or dot
+                  type: "line",      // ?? don't know what it does
+                  lineType: "vertical",    // ?? don't know what it does
+                  endScale: 8     // dot size
+                },
+                color: ["purple"],
+                x: 730,
+                y: 220,
+                dy: 50,
+                dx: -40
+              }
+            ]
+            // Add annotation to the chart
+            const makeAnnotations = d3.annotation()
+              .annotations(annotations)
+            d3.select("svg")
+              .append("g")
+              .call(makeAnnotations);
+
+            svg.append("text")
+	.text("Overall, the abortion rate among young people (age <= 20)  has been significantly ")
+	.attr("x", 800)
+	.attr("y", -30);
+  svg.append("text")
+  .text("decreasing over the past two decedes. The pregnant percentage is also decreasing.")
+  .attr("x", 800)
+	.attr("y", 0);
+    svg.append("text")
+  .text("However, what is worth noticing is that the abortion rate is still relatively high, ")
+	.attr("x", 800)
+	.attr("y", 30);
+  svg.append("text")
+  .text("especially compared to other age groups, which is alarming to our society.")
+  .attr("x", 800)
+	.attr("y", 60);
+
+  
+
+});
+  }
+
+  
+  var update_middle = function () {
+  d3.select("svg").remove();
+  // set the dimensions and margins of the graph
+var margin = {top: 50, right: 620, bottom: 30, left: 70},
+    width = 1400 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// parse the date / time
+var parseTime = d3.timeParse("%Y");
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+
+// define the line
+var valueline = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.abortion_ratio); });
+
+var valueline_preg = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.preg_perc); });
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+  
+    
+    
+// Get the data
+d3.csv("https://raw.githubusercontent.com/mz44zhang/test/main/middle.csv").then(function(data) {
+
+  // format the data
+  data.forEach(function(d) {
+      d.year = parseTime(d.year);
+      d.preg_perc = d.preg_perc;
+      d.abortion_ratio = d.abortion_ratio;
+  });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.year; }));
+  y.domain([0, 0.4]);
+
+  // Add the valueline path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none")
+      .attr("d", valueline);
+
+   svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("stroke", "orange")
+     .style("stroke-dasharray", ("7,3"))
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none")
+      .attr("d", valueline_preg);
+
+  // Add the x Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // Add the y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+  
+  svg.append("rect").attr("x",600).attr("y",25).attr("width",13).attr("height", 10).style("fill", "steelblue")
+svg.append("rect").attr("x",600).attr("y",55).attr("width", 13).attr("height", 10).style("fill", "orange")
+svg.append("text").attr("x", 620).attr("y", 30).text("Abortion Ratio").style("font-size", "15px").attr("alignment-baseline","middle").style('fill', 'steelblue')
+svg.append("text").attr("x", 620).attr("y", 60).text("Pregnancy Percentage").style("font-size", "15px").attr("alignment-baseline","middle").style('fill', 'orange')
+
+
+  const annotations = [
+              {
+                note: {
+                  label: "Among middle age group, the lowest abortion rate is in 2016 with ratio of 0.15.",
+                  title: "Lowest abortion rate"
+                },
+                connector: {
+                  end: "dot",        // Can be none, or arrow or dot
+                  type: "line",      // ?? don't know what it does
+                  lineType: "vertical",    // ?? don't know what it does
+                  endScale: 8     // dot size
+                },
+                color: ["purple"],
+                x: 755,
+                y: 315,
+                dy: -40,
+                dx: -40
+              }
+            ]
+            // Add annotation to the chart
+            const makeAnnotations = d3.annotation()
+              .annotations(annotations)
+            d3.select("svg")
+              .append("g")
+              .call(makeAnnotations);
+
+              svg.append("text")
+	.text("The abortion ratio of middle age group people has also been decreasing in the past ")
+	.attr("x", 800)
+	.attr("y", -30);
+  svg.append("text")
+  .text("years while the pregnancy percentage stays almost stable. The medical advancement")
+  .attr("x", 800)
+	.attr("y", 0);
+    svg.append("text")
+  .text("of abortion surgeries and pills did not make female less careless in taking")
+	.attr("x", 800)
+	.attr("y", 30);
+  svg.append("text")
+  .text("contraception measures but did give them more choices over their future life.")
+  .attr("x", 800)
+	.attr("y", 60);
+
+
+});
+  }
+
+  
+  var update_old = function () {
+  d3.select("svg").remove();
+  // set the dimensions and margins of the graph
+  var margin = {top: 50, right: 620, bottom: 30, left: 70},
+    width = 1400 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+    // parse the date / time
+  var parseTime = d3.timeParse("%Y");
+  // set the ranges
+  var x = d3.scaleTime().range([0, width]);
+  var y = d3.scaleLinear().range([height, 0]);
+
+  // define the line
+  var valueline = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.abortion_ratio); });
+
+      // define the line
+  var valueline_preg = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.preg_perc); });
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+  var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  
+    
+    
+// Get the data
+  d3.csv("https://raw.githubusercontent.com/mz44zhang/test/main/old.csv").then(function(data) {
+
+  // format the data
+    data.forEach(function(d) {
+      d.year = parseTime(d.year);
+      d.preg_perc = d.preg_perc;
+      d.abortion_ratio = d.abortion_ratio;
+    });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.year;}));
+  y.domain([0, 0.4]);
+
+  // Add the valueline path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none")
+      .attr("d", valueline);
+
+   svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("stroke", "orange")
+     .style("stroke-dasharray", ("7,3"))
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none")
+      .attr("d", valueline_preg);
+
+  // Add the x Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // Add the y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+  
+  svg.append("rect").attr("x",600).attr("y",25).attr("width",13).attr("height", 10).style("fill", "steelblue")
+svg.append("rect").attr("x",600).attr("y",55).attr("width", 13).attr("height", 10).style("fill", "orange")
+svg.append("text").attr("x", 620).attr("y", 30).text("Abortion Ratio").style("font-size", "15px").attr("alignment-baseline","middle").style('fill', 'steelblue')
+svg.append("text").attr("x", 620).attr("y", 60).text("Pregnancy Percentage").style("font-size", "15px").attr("alignment-baseline","middle").style('fill', 'orange')
+
+
+  const annotations = [
+              {
+                note: {
+                  label: "Among elderly age group, the lowest abortion rate is in 2017 with ratio of 0.17.",
+                  title: "Lowest abortion rate"
+                },
+                connector: {
+                  end: "dot",        // Can be none, or arrow or dot
+                  type: "line",      // ?? don't know what it does
+                  lineType: "vertical",    // ?? don't know what it does
+                  endScale: 8     // dot size
+                },
+                color: ["purple"],
+                x: 780,
+                y: 295,
+                dy: 20,
+                dx: -40
+              }
+            ]
+            // Add annotation to the chart
+            const makeAnnotations = d3.annotation()
+              .annotations(annotations)
+            d3.select("svg")
+              .append("g")
+              .call(makeAnnotations);
+
+     svg.append("text")
+	.text("For elderly people, their pregnancy percentage has been stably low in the past ")
+	.attr("x", 800)
+	.attr("y", -30);
+  svg.append("text")
+  .text("years. The abortion rate however is surprisingly high in the beginning.")
+  .attr("x", 800)
+	.attr("y", 0);
+    svg.append("text")
+  .text("The trend of abortion rate of elderly people is quite similar to that of teenagers.")
+	.attr("x", 800)
+	.attr("y", 30);
+
+
+
+});
+  }
+
+
+</script>
+</body>
